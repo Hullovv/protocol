@@ -201,7 +201,16 @@ type zapLogger[T zaputil.Encoder[T]] struct {
 }
 
 func NewZapLogger(conf *Config, opts ...ZapLoggerOption) (ZapLogger, error) {
-	zap := zap.New(nil).WithOptions(zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel)).Sugar()
+	cfg := zap.NewProductionConfig()
+	cfg.OutputPaths = []string{
+		"/var/log/myproject/myproject.log",
+	}
+	defaultLog, err := cfg.Build()
+	if err != nil {
+		return nil, err
+	}
+
+	zapLog := defaultLog.WithOptions(zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel)).Sugar()
 
 	zc := &zapConfig{
 		conf:          conf,
@@ -228,9 +237,9 @@ func NewZapLogger(conf *Config, opts ...ZapLoggerOption) (ZapLogger, error) {
 	}
 
 	if conf.JSON {
-		return newZapLogger(zap, zc, zaputil.NewProductionEncoder(), sampler), nil
+		return newZapLogger(zapLog, zc, zaputil.NewProductionEncoder(), sampler), nil
 	} else {
-		return newZapLogger(zap, zc, zaputil.NewDevelopmentEncoder(), sampler), nil
+		return newZapLogger(zapLog, zc, zaputil.NewDevelopmentEncoder(), sampler), nil
 	}
 }
 
