@@ -201,16 +201,17 @@ type zapLogger[T zaputil.Encoder[T]] struct {
 }
 
 func NewZapLogger(conf *Config, opts ...ZapLoggerOption) (ZapLogger, error) {
-	cfg := zap.NewProductionConfig()
-	cfg.OutputPaths = []string{
-		"/var/log/myproject/myproject.log",
-	}
-	defaultLog, err := cfg.Build()
-	if err != nil {
-		return nil, err
-	}
+	// cfg := zap.NewProductionConfig()
+	// cfg.OutputPaths = []string{
+	// 	"/var/log/myproject/myproject.log",
+	// }
+	// defaultLog, err := cfg.Build()
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	zapLog := defaultLog.WithOptions(zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel)).Sugar()
+	// zapLog := defaultLog.WithOptions(zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel)).Sugar()
+	zapLog := zap.New(nil).WithOptions(zap.AddCaller(), zap.AddStacktrace(zap.ErrorLevel)).Sugar()
 
 	zc := &zapConfig{
 		conf:          conf,
